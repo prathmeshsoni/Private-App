@@ -28,7 +28,7 @@ SECRET_KEY = 'we55%cuin!v$lnh_*m&*@v-mby5wwokxgj7x9!o3)ozfo7ko^m'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['.vercel.app']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -142,8 +142,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = os.path.join(BASE_DIR, 'static')
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATIC_ROOT = '/home/privateaccount/private_info/static'
 
 MEDIA_URL = '/hit/uploads/'
