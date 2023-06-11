@@ -1,1 +1,0 @@
-web gunicon private_info.wsgi:application --log-file -
