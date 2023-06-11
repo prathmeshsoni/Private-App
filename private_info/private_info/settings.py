@@ -141,8 +141,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/privateaccount/private_info/static'
-django_heroku.settings(locals())
+STATICFILES_DIRS = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
+
+# STATIC_ROOT = '/home/privateaccount/private_info/static'
 
 MEDIA_URL = '/hit/uploads/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
