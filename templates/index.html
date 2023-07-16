@@ -51,7 +51,7 @@
 
 					         <div class="col-md-8 display-block mx-auto display-flex h-100"
                                 style=" justify-content: center; display: flex; align-items: center;">
-					             <a href="/private/" >
+					             <a href="/" >
                                     <img class="width-255" src="{% static 'admin/folder/images/music_club.png' %}" alt="">
                                 </a>
                             </div>
@@ -82,8 +82,10 @@
 
     {% if request.session.private_admin %}
         <script>
-             window.onload = function exampleFunction(){
-                 window.location.href = '/private/view/';
+            window.onload = function exampleFunction(){
+                setTimeout(function() {
+                    window.location.href = "/view/";
+                }, 5000);
             }
         </script>
     {% else %}

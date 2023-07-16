@@ -3,12 +3,13 @@ import os
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 class PrivateModel(models.Model):
     date_name = models.DateField()
     private_description = models.TextField(null = True)
-    # private_img = models.FileField(null =True ,upload_to = 'Private/PrivateImage')
+    user = models.ForeignKey(User ,on_delete=models.CASCADE, null = True)
 
     def __str__(self):
         return "%s" % (self.date_name)

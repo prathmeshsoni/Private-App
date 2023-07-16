@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.models import User
 from .models import PrivateModel
 
 
@@ -10,8 +11,10 @@ class PrivateForm(forms.ModelForm):
             attrs={
                 'type': 'date', 'placeholder': 'yyyy-mm-dd (DOB)',
                 'class': 'form-control'
-                }
-            )
+            }
+        )
+
     class Meta:
         model = PrivateModel
-        fields = "__all__"
+        exclude = ['user']
+        fields = ['date_name', 'private_description']

@@ -49,7 +49,7 @@
         		    <div class="box">
                         <div class="box-body">
         				    <div>
-        				        <a href="/private/view/{{i.id}}">
+        				        <a href="/view/{{i.id}}">
                 					<h3 class="box-title mb-0">
                 					    <span>
                 					        <i style="margin-right: 20px;" class="fa fa-info-circle" aria-hidden="true"></i>
@@ -117,7 +117,7 @@
 
   function updateModel(id) {''
     $.ajax({
-      url: '/private/updatepra/',
+      url: '/updatepra/',
       method: 'POST',
       data: { 'id': id, csrfmiddlewaretoken: '{{csrf_token}}' },
       dataType: 'JSON',
@@ -142,7 +142,7 @@
     function Delete(id){
         let confirmAction = confirm("You want to delete Private Item?")
         if (confirmAction){
-            window.location.href = "/private/remove_pri/" + id + "";
+            window.location.href = "/remove_pri/" + id + "";
         }
         else{
 

@@ -1,0 +1,13 @@
+beautifulsoup4==4.12.2
+crispy-bootstrap4==2022.1
+Django==4.2.1
+django-bootstrap4==22.3
+django-crispy-forms==2.0
+djangorestframework==3.14.0
+google-api-core==2.11.0
+google-api-python-client==2.86.0
+google-auth==2.18.1
+google-auth-httplib2==0.1.0
+google-auth-oauthlib==1.0.0
+googleapis-common-protos==1.59.0
+requests==2.30.0

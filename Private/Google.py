@@ -13,10 +13,13 @@ def Create_Service(api_name, api_version, prefix=''):
     print(working_dir)
 
     print(os.listdir(working_dir))
-    token_file = working_dir + '/private_info/Private/' + 'token_drive_v3.pickle'
+    token_file = working_dir + '/Private/' + 'token_drive_v3.pickle'
     print(token_file)
-    with open(token_file, 'rb') as token:
-        cred = pickle.load(token)
+    try:
+        with open(token_file, 'rb') as token:
+            cred = pickle.load(token)
+    except Exception as e:
+        print('ees', e)
 
     if not cred or not cred.valid:
         print("pickle.load(token)")

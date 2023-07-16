@@ -11,6 +11,7 @@
             <div class="col-md-4">
                 <h5 class="card-title">Manage Private Window Details</h5>
             </div>
+            
             <div class="col-md-2" >
                 <div style="text-align-last: center; padding-top:12px; " >
                     <button id="download_button" type="button" onclick="DownloadModel({{order.id}})" class="btn btn-success btn-light" style="
@@ -26,7 +27,7 @@
             <div class="col-md-3" style=" padding-top:12px; " >
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="javascript:void(0)"><i class="fa fa-dashboard mr-1"></i> Private</a></li>
-                <li class="breadcrumb-item"><a href="/private/view/">Window</a></li>
+                <li class="breadcrumb-item"><a href="/view/">Window</a></li>
                 <li class="breadcrumb-item active">Private ID :{{order.id}}</li>
                 </ol>
             </div>
@@ -158,7 +159,7 @@
 		</button>
 	  </div>
 	  <div class="modal-body">
-        <form method="POST" id="Addcategory" enctype="multipart/form-data" action="/private/view/">
+        <form method="POST" id="Addcategory" enctype="multipart/form-data" action="/view/">
           <input type="hidden" name="id" id="id" value="" />
           <div class="form-group">
             <div class="row">
@@ -251,7 +252,7 @@
             $('#download_button').prop('disabled', true);
             $('#download_button').css('cursor', 'wait');
             $.ajax({
-                url: '/private/download_data/',
+                url: '/download_data/',
                 method: 'POST',
                 data: { 'id': id, csrfmiddlewaretoken: '{{csrf_token}}', 'check':1 },
                 dataType: 'JSON',
@@ -284,7 +285,7 @@
             $('#delete_button').css('cursor', 'wait');
             var inputValue = document.getElementById('drive_url').getAttribute('href');
             $.ajax({
-                url: '/private/download_data/',
+                url: '/download_data/',
                 method: 'POST',
                 data: {csrfmiddlewaretoken: '{{csrf_token}}', 'check': 0 , 'folder_id': inputValue},
                 dataType: 'JSON',
@@ -313,7 +314,7 @@
     }
     function updateModel(id) {
         $.ajax({
-          url: '/private/updatepra/',
+          url: '/updatepra/',
           method: 'POST',
           data: { 'id': id, csrfmiddlewaretoken: '{{csrf_token}}' },
           dataType: 'JSON',
@@ -337,7 +338,7 @@
     function Delete(id){
         let confirmAction = confirm("You want to delete Private Item?")
         if (confirmAction){
-            window.location.href = "/private/remove_pri/" + id + "";
+            window.location.href = "/remove_pri/" + id + "";
         }
         else{
 
@@ -346,7 +347,7 @@
     function Delete_1(id){
         let confirmAction = confirm("You want to delete Photo?")
         if (confirmAction){
-            window.location.href = "/private/remove_photo/" + id + "";
+            window.location.href = "/remove_photo/" + id + "";
         }
         else{
 

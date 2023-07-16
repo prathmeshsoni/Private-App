@@ -12,8 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
-import django_heroku
-import dj_database_url
+from .config import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,17 +24,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'we55%cuin!v$lnh_*m&*@v-mby5wwokxgj7x9!o3)ozfo7ko^m'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with debug turned on in production! True False
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
 INSTALLED_APPS = [
     'private_info',
     'Private',
+    'User',
     'crispy_forms',
     'crispy_bootstrap4',
     'django.contrib.admin',
@@ -86,20 +85,19 @@ TEMPLATES = [
 WSGI_APPLICATION = 'private_info.wsgi.application'
 
 
-LOGIN_REDIRECT_URL = '/private/'
-LOGOUT_REDIRECT_URL = '/private/'
+LOGIN_REDIRECT_URL = '/view/'
+LOGOUT_REDIRECT_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'privateaccount$private_info',
-        'HOST': 'privateaccount.mysql.pythonanywhere-services.com',
-        'USER': 'privateaccount',
-        'PASSWORD':'Private@123Admin',
-
+        'ENGINE': ENGINE,
+        'NAME': NAME,
+        'HOST': HOST,
+        'USER': USER,
+        'PASSWORD': PASSWORD,
     }
 }
 
@@ -141,9 +139,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = os.path.join(BASE_DIR, 'static')
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATIC_ROOT = '/home/privateaccount/private_info/static'
+STATIC_ROOT = BASE_DIR / "static"
 
-MEDIA_URL = '/hit/uploads/'
+MEDIA_URL = '/uploads/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
+
+EMAIL_BACKEND = EMAIL_BACKEND
+EMAIL_HOST = EMAIL_HOST
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_PORT = EMAIL_PORT
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD

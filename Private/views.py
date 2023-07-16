@@ -15,10 +15,12 @@ from Private.Google import Create_Service
 import os
 
 
+# 404 Page Not Found
 def page_not_found_view(request, exception):
     return render(request, '404.html', status=404)
 
 
+# Private LogIn Screen
 def admin_private(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -39,22 +41,19 @@ def admin_private(request):
             return redirect(request.META.get('HTTP_REFERER'))
 
         if (userobj).is_superuser:
-            if userobj.is_staff == 2:
-                # print('Fails');
-                # messages.success(request, f'Failss.{userobj.is_staff}')
-                # return redirect('/private/')
-
+            if userobj.is_staff:
                 try:
                     user = UserModel.objects.get(email=username)
                     user11 = authenticate( username = user , password = password)
                     if (user11) is None:
                         messages.success(request, 'Wrong Password.')
-                        return redirect('/private/')
+                        return redirect('/')
 
                     # login(request , user11)
-                    request.session['private_admin'] = user
+                    request.session['private_admin'] = user11.username
+                    request.session['private_id'] = user11.id
                     request.session['login_time'] = datetime.now().timestamp()
-                    return redirect('/private/view/')
+                    return redirect('/view/')
 
                 except:
                     usee = None;
@@ -63,12 +62,13 @@ def admin_private(request):
 
                 if (user1 or usee ) is None:
                     messages.success(request, 'Wrong Password.')
-                    return redirect('/private/')
+                    return redirect('/')
 
                 # login(request , user1)
-                request.session['private_admin'] = username
+                request.session['private_admin'] = user1.username
+                request.session['private_id'] = user1.id
                 request.session['login_time'] = datetime.now().timestamp()
-                return redirect('/private/view/')
+                return redirect('/view/')
 
 
     # elif request.method == 'GET':
@@ -78,6 +78,20 @@ def admin_private(request):
     #     return redirect('/user/dashboard/')
 
 
+# Private LogOut
+def logout_private_admin(request):
+    if 'private_admin' in request.session:
+        del request.session['private_admin']
+        del request.session['login_time']
+        try:
+            del request.session['private_id']
+        except:
+            pass
+    # logout(request)
+    return redirect('/')
+
+
+# Logout Every 30 minutes
 def some_view(request):
     # Check if session has expired
     login_time = request.session.get('login_time')
@@ -92,10 +106,48 @@ def some_view(request):
     return check
 
 
+# View All Details
+def admin_private_view(request):
+    check = some_view(request)
+    if int(check) == 1:
+        return redirect('/logout/')
+    else:
+        if request.method == 'POST':
+            try:
+                id = request.POST.get('id')
+                jj = PrivateModel.objects.get(id=id)
+                d = PrivateForm(request.POST or None,instance=jj,)
+            except:
+                d = PrivateForm(request.POST)
+            if d.is_valid():
+                user_id = request.session.get('private_id')
+                user_obj = User.objects.get(id = user_id)
+                private_data = d.save(commit=False)
+                private_data.user = user_obj
+                private_data.save()
+                id = private_data.id
+                return redirect(f'/view/{id}')
+            else:
+                return redirect(f'/view/')
+        else:
+            if 'private_admin' in request.session:
+                d = PrivateForm()
+                user2 = request.session.get('private_admin')
+                user_obj2 = User.objects.get( username = user2)
+                b = PrivateModel.objects.filter(user=user_obj2).order_by('-date_name')
+                # b = PrivateModel.objects.all()
+                x = {'m':d,'list':b,'private_master':'master','private_active':'private_master', "private_1":0, "checkcon":0}
+            else:
+                return redirect('/')
+        return render(request , 'private_des.html', x)
+        
+
+# View All Photo, Add Photo 
 def private_view(request,hid):
     check = some_view(request)
     if int(check) == 1:
-        return redirect('/private/logout/')
+        # call this fun logout_private_admin()
+        return redirect('/logout/')
     else:
         if request.method == 'POST':
             id = request.POST.get("p_id")
@@ -108,61 +160,29 @@ def private_view(request,hid):
                 else:
                     type = "photo"
                 pro_obj = Private_SubModel()
-
                 pri_id = PrivateModel.objects.get(id = id)
                 pro_obj.private_id = pri_id
                 pro_obj.private_img = f
                 pro_obj.type = type
                 pro_obj.save()
 
-            return redirect(f"/private/view/{hid}")
+            return redirect(f"/view/{hid}")
         else:
             if 'private_admin' in request.session:
-                pro_list = Private_SubModel.objects.filter(private_id=hid)
+                user2 = request.session.get('private_admin')
                 order = PrivateModel.objects.get(id=hid)
-                d = PrivateForm()
-                data = {'m':d,'private_master':'master','private_activee':'private_masterr','lists':pro_list,'order':order,"private_1":0, "checkcon":0}
+                if order.user.username == user2:
+                    pro_list = Private_SubModel.objects.filter(private_id=hid)
+                    d = PrivateForm()
+                    data = {'m':d,'private_master':'master','private_activee':'private_masterr','lists':pro_list,'order':order,"private_1":0, "checkcon":0}
+                else:
+                    return redirect('/view/')
             else:
-                return redirect('/private/')
+                return redirect('/')
             return render(request , 'private.html', data)
 
 
-def logout_private_admin(request):
-    if 'private_admin' in request.session:
-        del request.session['private_admin']
-        del request.session['login_time']
-    # logout(request)
-    return redirect('/private/')
-
-
-def admin_private_view(request):
-    check = some_view(request)
-    if int(check) == 1:
-        return redirect('/private/logout/')
-    else:
-        if request.method == 'POST':
-            try:
-                id = request.POST.get('id')
-                jj = PrivateModel.objects.get(id=id)
-                d = PrivateForm(request.POST or None,instance=jj)
-            except:
-                try:
-                    d = PrivateForm(request.POST or None)
-                except Exception as e:
-                    print("Error :: ", e)
-            if d.is_valid():
-                d.save()
-                return redirect(f'/private/view/{id}')
-        else:
-            if 'private_admin' in request.session:
-                d = PrivateForm()
-                b = PrivateModel.objects.all()
-                x = {'m':d,'list':b,'private_master':'master','private_active':'private_master', "private_1":0, "checkcon":0}
-            else:
-                return redirect('/private/')
-        return render(request , 'private_des.html', x)
-
-
+# Private Detail Function
 @api_view(['POST'])
 def updatepra(request):
     id = request.POST.get('id')
@@ -170,28 +190,47 @@ def updatepra(request):
     serializer = PrivateSerialize(get_data)
     return Response(serializer.data)
 
+
+# Delete Detail Fun
 def remove_pri(request,hid):
-    obj = PrivateModel.objects.get(id = hid)
-    obj.delete()
-    return redirect('/private/view/')
+    if 'private_admin' in request.session:
+        user2 = request.session.get('private_admin')
+        obj = PrivateModel.objects.get(id = hid)
+        if obj.user.username == user2:
+            obj.delete()
+            return redirect('/view/')
+        else:
+            return redirect('/view/')
+    else:
+        return redirect('/')
 
+
+# Delete Photo Fun
 def remove_photo(request,hid):
-    obj = Private_SubModel.objects.get(id = hid)
-    jj = obj.private_id.id
-    obj.delete()
-    return redirect(f'/private/view/{jj}')
+    if 'private_admin' in request.session:
+        user2 = request.session.get('private_admin')
+        obj = Private_SubModel.objects.get(id = hid)
+        if obj.private_id.user.username == user2:
+            jj = obj.private_id.id
+            obj.delete()
+            return redirect(f'/view/{jj}')
+        else:
+            return redirect('/view/')
+    else:
+        return redirect('/')
 
 
+# Upload Into Google Drive
 def download_data(request):
     if request.method == 'POST':
         condition_check = request.POST.get('check')
-        print(condition_check)
         if int(condition_check) == 1:
             id = request.POST.get('id')
             try:
                 folder_url = upload(id)
                 a = {'url': folder_url, 'status': True}
-            except:
+            except Exception as e:
+                print('ee1', e)
                 a = {'status': False}
         else:
             vall = request.POST.get('folder_id')
@@ -199,7 +238,8 @@ def download_data(request):
             try:
                 folder_url = delete_drive(folder_id)
                 a = {'url': folder_url, 'status': True}
-            except:
+            except Exception as e:
+                print('ee', e)
                 a = {'status': False}
         return JsonResponse(a)
     else:
@@ -207,6 +247,7 @@ def download_data(request):
         return JsonResponse(a)
 
 
+# Upload Folder, File, Photos/Videos Into Google Drive
 def upload(id):
     order = PrivateModel.objects.get(id=id)
     folder_name = str(order.date_name)
@@ -228,7 +269,7 @@ def upload(id):
     folder_metadata = {
         'name': folder_name,
         'mimeType': folder_type,
-        'parents': ['1B46tgqRWsSWw_EU-tGAWoUSUVqD71Psc']
+        'parents': ['1sVXo51JUcsULkQBRa2N-BqPEh-_LdzTj']
     }
     folder = service.files().create(
         body=folder_metadata,
@@ -251,7 +292,7 @@ def upload(id):
 
     working_dir = os.getcwd()
 
-    file_pathh = working_dir + '/private_info/uploads/text.txt'
+    file_pathh = working_dir + '/uploads/text.txt'
     with open(file_pathh, "w") as file:
         file.write(str(order.private_description))
 
@@ -293,7 +334,7 @@ def upload(id):
             'parents': [folder_id],
         }
 
-        img_content = MediaFileUpload(working_dir + '/private_info/uploads/' +file_11, mimetype=img_type)
+        img_content = MediaFileUpload(working_dir + '/uploads/' +file_11, mimetype=img_type)
         file = service.files().create(
             body=img_metadata,
             media_body=img_content,
@@ -309,9 +350,9 @@ def upload(id):
     return folder_url
 
 
+# Delete Google Drive Folder
 def delete_drive(folder_id):
     API_NAME = 'drive'
     API_VERSION = 'v3'
     service = Create_Service(API_NAME, API_VERSION)
     service.files().delete(fileId=folder_id).execute()
-
