@@ -1,15 +1,18 @@
-from .models import Profile
-from django.shortcuts import redirect, render
-from django.contrib.auth.models import User
-from django.contrib import messages
-from .models import *
 import uuid
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-from django.http import JsonResponse
 
-#Change User Password
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.core.mail import EmailMessage
+from django.http import JsonResponse
+from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
+
+from .models import *
+from .models import Profile
+
+
+# Change User Password
 def change_password(request):
     if 'userid' in request.session:
         if request.method == 'POST':
@@ -20,7 +23,7 @@ def change_password(request):
             user = User.objects.get(id=user2)
             un = user.username
             check = user.check_password(current)
-            if check==True:
+            if check == True:
                 user.set_password(new_pas)
                 user.save()
                 a = {'status': True}
@@ -34,50 +37,51 @@ def change_password(request):
                 count = cart_count(user2)
                 user_obj2 = User.objects.get(id=user2)
                 alldata = add_to_cart.objects.filter(user=user_obj2)
-                total_price = cartdetail(alldata,user2)
+                total_price = cartdetail(alldata, user2)
             except:
                 count = 0
                 alldata = 0
                 total_price = 0
-            return render(request,"user/change-password.html",{'change_active':'password_master','cartt':alldata,'total_price':total_price,'cart_val':count})
+            return render(request, "user/change-password.html",
+                          {'change_active': 'password_master', 'cartt': alldata, 'total_price': total_price,
+                           'cart_val': count})
     else:
         messages.success(request, 'First You Need to Login')
         return redirect('/user/accounts/login/')
 
 
-#Registration Page for User
+# Registration Page for User
 def register_attempt(request):
-
     if request.method == 'POST':
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        try:
-            if User.objects.filter(username = username).first():
-                a = {'status': True,'exists':'existuser'}
-                return JsonResponse(a)
-
-            if User.objects.filter(email = email).first():
-                a = {'status': True,'exists':'existemail'}
-                return JsonResponse(a)
-
-            user_obj = User(username = username , email = email)
-            user_obj.set_password(password)
-            user_obj.save()
-            auth_token = str(uuid.uuid4())
-            profile_obj = Profile.objects.create(user = user_obj , auth_token = auth_token)
-            profile_obj.save()
-            send_mail_after_registration(email, username, auth_token)
-            a = {'status': True,'create':'usercreate','u_name':username}
+        # try:
+        if User.objects.filter(username=username).first():
+            a = {'status': True, 'exists': 'existuser'}
             return JsonResponse(a)
 
+        if User.objects.filter(email=email).first():
+            a = {'status': True, 'exists': 'existemail'}
+            return JsonResponse(a)
 
-        except:
-            print("e");
+        auth_token = str(uuid.uuid4())
+        # send_mail_after_registration(email, username, auth_token)
+        user_obj = User(username=username, email=email)
+        user_obj.set_password(password)
+        user_obj.save()
 
-            a = {'status': False}
-        # return JsonResponse(a)
+        profile_obj = Profile.objects.create(user=user_obj, auth_token=auth_token)
+        profile_obj.save()
+        verify(request, auth_token)
+
+        a = {'status': True, 'create': 'usercreate', 'u_name': username}
+        return JsonResponse(a)
+
+        # except:
+        #     a = {'status': False}
+        #     return JsonResponse(a)
 
 
     else:
@@ -85,47 +89,46 @@ def register_attempt(request):
             return redirect('/')
         else:
             return render(
-                request , 
+                request,
                 'user/register.html',
-                {'cartc':'2'}
+                {'cartc': '2'}
             )
 
 
-#Account Activation Mail Send
-def send_mail_after_registration(email,username , token):
+# Account Activation Mail Send
+def send_mail_after_registration(email, username, token):
     email_template_name = 'user/verifymail.html'
     parameters = {
-        'domain' : 'private-app.monarksoni.com/user/verify',
-        'token' : f'{token}',
-        'protocol' : 'https',
-        'username' : f'{username}',
+        'domain': 'private-app.monarksoni.com/user/verify',
+        'token': f'{token}',
+        'protocol': 'https',
+        'username': f'{username}',
 
     }
-    html_template = render_to_string(email_template_name, parameters )
+    html_template = render_to_string(email_template_name, parameters)
     subject = 'Registration Complete'
 
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
 
-    message = EmailMessage(subject , html_template , email_from , recipient_list )
+    message = EmailMessage(subject, html_template, email_from, recipient_list)
     message.content_subtype = 'html'
     message.send()
 
 
-
-#After Mail Send Page
+# After Mail Send Page
 def token_send(request):
     if 'userid' in request.session:
         return redirect('/')
     else:
-        return render(request , 'user/token_send.html')
+        return render(request, 'user/token_send.html')
 
 
-#check Email verification
-def verify(request , auth_token):
+# check Email verification
+def verify(request, auth_token):
     try:
-        profile_obj = Profile.objects.filter(auth_token = auth_token).first()
-        user_obj = User.objects.filter(username = profile_obj.user.username).first()
+        profile_obj = Profile.objects.filter(auth_token=auth_token).first()
+        user_obj = User.objects.filter(username=profile_obj.user.username).first()
 
         if profile_obj:
             if profile_obj.is_verified:
@@ -143,7 +146,7 @@ def verify(request , auth_token):
         print(e)
         return redirect('/')
 
-#for User Forgot Passward
+# for User Forgot Passward
 # def forget_passward(request):
 #     if request.method == 'POST':
 #         password_form = PasswordResetForm(request.POST)
@@ -217,4 +220,3 @@ def verify(request , auth_token):
 #             'password_form' : password_form,
 #     }
 #     return render(request, 'user/password_reset_form.html', context)
-

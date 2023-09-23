@@ -93,6 +93,7 @@ def logout_private_admin(request):
 
 # Logout Every 30 minutes
 def some_view(request):
+    return 0
     # Check if session has expired
     login_time = request.session.get('login_time')
     if login_time:
@@ -103,6 +104,7 @@ def some_view(request):
             check = 0
     else:
         check = 1
+    check = 0
     return check
 
 

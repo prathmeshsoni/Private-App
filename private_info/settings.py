@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
-from .config import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,9 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'we55%cuin!v$lnh_*m&*@v-mby5wwokxgj7x9!o3)ozfo7ko^m'
 
 # SECURITY WARNING: don't run with debug turned on in production! True False
+# DEBUG = True
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 
@@ -93,11 +94,12 @@ LOGOUT_REDIRECT_URL = '/'
 
 DATABASES = {
     'default': {
-        'ENGINE': ENGINE,
-        'NAME': NAME,
-        'HOST': HOST,
-        'USER': USER,
-        'PASSWORD': PASSWORD,
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'prathmes_private-app',
+        'HOST': 'localhost',
+        'USER': 'prathmes_admin',
+        'PASSWORD':'Lookathersmile',
+
     }
 }
 
@@ -140,13 +142,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "static"
+# STATICFILES_DIRS = [ os.path.join(BASE_DIR, 'static') ]
+# STATICFILES_STORAGE = 'public_html/static'
+# STATICFILES_DIRS = "public_html/static"
 
 MEDIA_URL = '/uploads/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 
-EMAIL_BACKEND = EMAIL_BACKEND
-EMAIL_HOST = EMAIL_HOST
-EMAIL_USE_TLS = EMAIL_USE_TLS
-EMAIL_PORT = EMAIL_PORT
-EMAIL_HOST_USER = EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = False
+# EMAIL_USE_SSL = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'team.musicclub.com@gmail.com'
+EMAIL_HOST_PASSWORD = 'iicczlipqelikyrc'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

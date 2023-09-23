@@ -79,7 +79,7 @@ urlpatterns = [
     path('admin_side/', admin.site.urls),
     path('',include('Private.urls')),
     path('user/',include('User.urls')),
-    re_path(r'^hit/uploads/(?P<path>.*)$', protected_serve,{'document_root':settings.MEDIA_ROOT}),
+    re_path(r'^uploads/(?P<path>.*)$', protected_serve,{'document_root':settings.MEDIA_ROOT}),
 ]
 
 handler404 = "Private.views.page_not_found_view"
